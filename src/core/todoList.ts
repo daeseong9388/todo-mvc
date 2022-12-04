@@ -1,4 +1,4 @@
-import { PlainTodo, Todo } from './todo';
+import { InputTodo, PlainTodo, Todo } from './todo';
 
 export interface CUD {
   add: (label: string) => TodoList;
@@ -20,56 +20,60 @@ export interface READ {
 
 export class TodoList implements CUD, READ {
   private readonly todoList: Todo[];
-  constructor(todoList?: Todo[]) {
-    this.todoList = todoList ?? [];
+  constructor(todoList?: InputTodo[]) {
+    this.todoList = todoList?.map(el => new Todo(el)) ?? [];
+  }
+
+  private static toPlain(todoList: Todo[]) : PlainTodo[] {
+    return todoList.map(el => el.toPlain());
   }
 
   add(label: string): TodoList {
-    return new TodoList([new Todo({label}), ...this.todoList]);
+    return new TodoList(TodoList.toPlain([new Todo({label}), ...this.todoList]));
   }
 
   delete(id: string): TodoList {
-    return new TodoList(this.todoList.filter((el) => el.id !== id));
+    return new TodoList(TodoList.toPlain(this.todoList.filter((el) => el.id !== id)));
   }
 
   edit(id: string, label: string): TodoList {
-    return new TodoList(
-      this.todoList.map((el) => (el.id === id ? el.edit(label) : el))
+    return new TodoList(TodoList.toPlain(
+      this.todoList.map((el) => (el.id === id ? el.edit(label) : el)))
     );
   }
 
   setDone(id: string): TodoList {
-    return new TodoList(
-      this.todoList.map((el) => (el.id === id ? el.setDone() : el))
+    return new TodoList(TodoList.toPlain(
+      this.todoList.map((el) => (el.id === id ? el.setDone() : el)))
     );
   }
 
   toggleDone(id: string): TodoList {
-    return new TodoList(
-      this.todoList.map((el) => (el.id === id ? el.toggleDone() : el))
+    return new TodoList(TodoList.toPlain(
+      this.todoList.map((el) => (el.id === id ? el.toggleDone() : el)))
     );
   }
 
   clearDone(): TodoList {
-    return new TodoList(this.todoList.filter((el) => !el.done));
+    return new TodoList(TodoList.toPlain(this.todoList.filter((el) => !el.done)));
   }
 
   markAllDone(): TodoList {
-    return new TodoList(this.todoList.map((el) => el.setDone()));
+    return new TodoList(TodoList.toPlain(this.todoList.map((el) => el.setDone())));
   }
 
   markAllReady(): TodoList {
-    return new TodoList(this.todoList.map((el) => el.setReady()));
+    return new TodoList(TodoList.toPlain(this.todoList.map((el) => el.setReady())));
   }
 
   filter(type: FilterType): PlainTodo[] {
     switch (type) {
       case 'ALL':
-        return this.todoList.map((el) => el.toPlain());
+        return TodoList.toPlain(this.todoList);
       case 'READY':
-        return this.todoList.filter((el) => !el.done).map((el) => el.toPlain());
+        return TodoList.toPlain(this.todoList.filter((el) => !el.done));
       case 'DONE':
-        return this.todoList.filter((el) => el.done).map((el) => el.toPlain());
+        return TodoList.toPlain(this.todoList.filter((el) => el.done));
     }
   }
 

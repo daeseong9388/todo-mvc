@@ -6,6 +6,8 @@ export interface PlainTodo {
   done: boolean;
 }
 
+export type InputTodo = Partial<PlainTodo>;
+
 export interface Update {
   setDone: () => Todo;
   setReady: () => Todo;
@@ -17,10 +19,10 @@ export class Todo implements PlainTodo, Update {
   id: string;
   label: string;
   done: boolean;
-  constructor(label: string) {
-    this.id = uuidv4();
-    this.label = label;
-    this.done = false;
+  constructor(todo: InputTodo) {
+    this.id = todo.id ?? uuidv4();
+    this.label = todo.label ?? '';
+    this.done = todo.done ?? false;
   }
 
   setDone(): Todo {

@@ -25,7 +25,7 @@ export class TodoList implements CUD, READ {
   }
 
   add(label: string): TodoList {
-    return new TodoList([new Todo(label), ...this.todoList]);
+    return new TodoList([new Todo({label}), ...this.todoList]);
   }
 
   delete(id: string): TodoList {
